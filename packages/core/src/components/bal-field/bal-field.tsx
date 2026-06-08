@@ -1,5 +1,5 @@
 import { Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Prop, Watch } from '@stencil/core'
-import { HTMLStencilElement } from '@stencil/core/internal'
+import { HTMLStencilElement, transformTag } from '@stencil/core/internal'
 import { BalAriaFormLinking, defaultBalAriaForm } from '../../utils/form'
 import { deepReady, waitAfterFramePaint } from '../../utils/helpers'
 import { BalMutationObserver, ListenToMutation } from '../../utils/mutation'
@@ -123,7 +123,7 @@ export class Field implements ComponentInterface, BalMutationObserver {
     if (!parent) {
       return false
     }
-    if (parent.nodeName.toLowerCase() === 'bal-field' && parent !== this.el) {
+    if (parent.nodeName === transformTag('bal-field').toUpperCase() && parent !== this.el) {
       return false
     }
     if (parent === this.el) {

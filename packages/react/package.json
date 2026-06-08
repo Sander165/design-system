@@ -14,5 +14,15 @@
   "dependencies": {
     "@baloise/ds-core": "19.10.2",
     "@stencil/react-output-target": "1.2.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./index.esm.d.ts",
+      "import": "./index.esm.js"
+    },
+    "./tag-transformer": {
+      "types": "./tag-transformer.esm.d.ts",
+      "import": "./tag-transformer.esm.js"
+    }
   }
 }

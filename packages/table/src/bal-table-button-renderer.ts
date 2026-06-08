@@ -1,6 +1,7 @@
 import { ICellRendererComp, ICellRendererParams } from 'ag-grid-community'
 import { parseValue } from './utils/parsing'
 import { isNil } from './utils/nil'
+import { transformTag } from '@baloise/ds-core'
 
 interface BalTableButtonRendererOptions {
   color?: (params: ICellRendererParams) => BalProps.BalButtonColor
@@ -22,7 +23,7 @@ export function BalTableButtonRenderer(options: BalTableButtonRendererOptions): 
 
   Renderer.prototype.init = function (params: ICellRendererParams): void {
     this.params = params
-    this.element = document.createElement('bal-button')
+    this.element = document.createElement(transformTag('bal-button'))
     this.element.className = 'bal-table-cell-button'
     this.element.setAttribute('size', 'small')
     this.update()

@@ -1,5 +1,6 @@
 import { ICellRendererComp, ICellRendererParams } from 'ag-grid-community'
 import { parseValue } from './utils/parsing'
+import { transformTag } from '@baloise/ds-core'
 
 interface BalTableTextRendererOptions {
   color?: (params: ICellRendererParams) => BalProps.BalTextColor
@@ -19,11 +20,10 @@ export function BalTableTextRenderer(options: BalTableTextRendererOptions = {}):
     element.className = 'bal-table-cell-text'
     this.element = element
 
-    this.text = document.createElement('bal-text')
+    this.text = document.createElement(transformTag('bal-text'))
     this.text.setAttribute('small', 'true')
     this.text.setAttribute('space', 'none')
-
-    this.icon = document.createElement('bal-icon')
+    this.icon = document.createElement(transformTag('bal-icon'))
     this.icon.setAttribute('size', 'small')
 
     this.update()
