@@ -12,7 +12,7 @@ import {
   Watch,
   h,
 } from '@stencil/core'
-import { HTMLStencilElement } from '@stencil/core/internal'
+import { HTMLStencilElement, transformTag } from '@stencil/core/internal'
 import { BEM } from '../../utils/bem'
 import { BalBreakpointObserver, BalBreakpoints, ListenToBreakpoints, balBreakpoints } from '../../utils/breakpoints'
 import { balBrowser } from '../../utils/browser'
@@ -142,7 +142,7 @@ export class Nav
   @Listen('balChange')
   listenToPopupChanges(event: BalEvents.BalPopupChange) {
     const target = event.target
-    if (target && target.nodeName === 'BAL-POPUP') {
+    if (target && target.nodeName === transformTag('bal-popup').toUpperCase()) {
       const id = target.id
       const triggers = Array.from(this.el.querySelectorAll<HTMLBalButtonElement>(`[bal-popup="${id}"]`))
       if (event.detail === true) {

@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs'
 
 import type { BaloiseDesignSystemAngularConfig } from '..'
 import { BalTokenUserConfig, raf } from '..'
+import { transformTag } from '@stencil/core'
 
 @Directive()
 export class ValueAccessor implements ControlValueAccessor, AfterViewInit, OnDestroy {
@@ -161,7 +162,7 @@ export class ValueAccessor implements ControlValueAccessor, AfterViewInit, OnDes
 
 export const findFieldComponent = (element: ElementRef): { disabled: boolean; invalid: boolean } | undefined => {
   if (element && element.nativeElement) {
-    return element.nativeElement.closest('bal-field') || undefined
+    return element.nativeElement.closest(transformTag('bal-field')) || undefined
   }
   return undefined
 }

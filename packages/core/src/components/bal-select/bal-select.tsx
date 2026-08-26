@@ -12,7 +12,7 @@ import {
   State,
   Watch,
 } from '@stencil/core'
-import { HTMLStencilElement } from '@stencil/core/internal'
+import { HTMLStencilElement, transformTag } from '@stencil/core/internal'
 import isNil from 'lodash.isnil'
 import { ariaBooleanToString } from '../../utils/aria'
 import { areArraysEqual } from '../../utils/array'
@@ -856,7 +856,9 @@ export class Select implements ComponentInterface, Loggable, BalAriaFormLinking 
       target === null ||
       (target &&
         target.nodeName &&
-        (target.nodeName === 'BAL-MODAL' || target.nodeName === 'INPUT' || target.nodeName === 'BUTTON'))
+        (target.nodeName === transformTag('bal-modal').toUpperCase() ||
+          target.nodeName === 'INPUT' ||
+          target.nodeName === 'BUTTON'))
     ) {
       this.validateAfterBlur(isHuman)
     }

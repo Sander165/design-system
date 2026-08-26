@@ -1,3 +1,4 @@
+import { transformTag } from '@stencil/core'
 import { componentOnReady } from './helpers'
 
 // eslint-disable-next-line
@@ -24,7 +25,7 @@ export const attachComponent = async (
 
   const el: any =
     typeof component === 'string'
-      ? container.ownerDocument && container.ownerDocument.createElement(component)
+      ? container.ownerDocument && container.ownerDocument.createElement(transformTag(component))
       : component
 
   if (cssClasses) {

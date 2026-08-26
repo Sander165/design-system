@@ -27,7 +27,7 @@ import {
   PopupVariantRenderer,
 } from './variants'
 import { VariantRenderer } from './variants/variant.renderer'
-import { HTMLStencilElement } from '@stencil/core/internal'
+import { HTMLStencilElement, transformTag } from '@stencil/core/internal'
 
 @Component({
   tag: 'bal-popup',
@@ -425,9 +425,9 @@ export class Popup implements ComponentInterface, PopupComponentInterface, Logga
 
   private async dismissAllOtherPopups() {
     if (balBrowser.hasDocument) {
-      const popups = Array.from(document.getElementsByTagName('bal-popup')).filter(
-        el => el.id !== this.el.id && el.ariaHidden !== 'true',
-      )
+      const popups = Array.from(
+        document.getElementsByTagName(transformTag('bal-popup')) as HTMLCollectionOf<HTMLBalPopupElement>,
+      ).filter(el => el.id !== this.el.id && el.ariaHidden !== 'true')
       for (let index = 0; index < popups.length; index++) {
         const popup = popups[index]
         await popup._dismiss()

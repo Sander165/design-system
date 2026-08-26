@@ -1,4 +1,4 @@
-import { HTMLStencilElement } from '@stencil/core/internal'
+import { HTMLStencilElement, transformTag } from '@stencil/core/internal'
 import { balBrowser } from '../browser'
 import { addEventListener, removeEventListener } from '../helpers'
 import { focusableQueryString, focusFirstDescendant, focusLastDescendant, focusVisibleElement } from './focus-trap'
@@ -37,8 +37,12 @@ export const prepareOverlay = (overlay: OverlayInterface) => {
 }
 
 export const getOverlays = (doc: Document, selector?: string): HTMLBalOverlayElement[] => {
+  // the selector is built at runtime, so the compiler cannot transform the tags for us here.
+  // callers pass a plain tag name (e.g. 'bal-modal'), which we transform ourselves.
   if (selector === undefined) {
-    selector = 'bal-modal,bal-snackbar,bal-toast'
+    selector = `${transformTag('bal-modal')},${transformTag('bal-snackbar')},${transformTag('bal-toast')}`
+  } else {
+    selector = transformTag(selector)
   }
   return (Array.from(doc.querySelectorAll(selector)) as HTMLBalOverlayElement[]).filter(c => c.overlayIndex > 0)
 }
@@ -204,7 +208,7 @@ const trapKeyboardFocus = (ev: Event, doc: Document) => {
        * last focused element in the overlay if focus is
        * moved to the toast.
        */
-    } else if (target.tagName === 'BAL-TOAST') {
+    } else if (target.tagName === transformTag('bal-toast').toUpperCase()) {
       focusElementInOverlay(lastOverlay.lastFocus, lastOverlay)
     } else {
       /**

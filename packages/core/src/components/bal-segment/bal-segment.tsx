@@ -13,7 +13,7 @@ import {
   Watch,
   writeTask,
 } from '@stencil/core'
-import { HTMLStencilElement } from '@stencil/core/internal'
+import { HTMLStencilElement, transformTag } from '@stencil/core/internal'
 import { BalAnimationObserver, ListenToAnimation } from '../../utils/animation'
 import { BEM } from '../../utils/bem'
 import { BalBreakpointObserver, BalBreakpoints, ListenToBreakpoints } from '../../utils/breakpoints'
@@ -384,7 +384,7 @@ export class Segment
     // the user tried to swipe to a segment button and
     // click a segment button at the same time so we should
     // not update the checked segment button
-    if (current.tagName === 'BAL-SEGMENT') {
+    if (current.tagName === transformTag('bal-segment').toUpperCase()) {
       return
     }
 

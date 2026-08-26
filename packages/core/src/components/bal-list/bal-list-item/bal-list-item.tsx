@@ -10,7 +10,7 @@ import {
   Prop,
   State,
 } from '@stencil/core'
-import { HTMLStencilElement } from '@stencil/core/internal'
+import { HTMLStencilElement, transformTag } from '@stencil/core/internal'
 import { AccordionState } from '../../../interfaces'
 import { BEM } from '../../../utils/bem'
 import { BalConfigObserver, BalConfigState, ListenToConfig } from '../../../utils/config'
@@ -21,10 +21,14 @@ import { Loggable, Logger, LogInstance } from '../../../utils/log'
   tag: 'bal-list-item',
 })
 export class ListItem implements ComponentInterface, BalConfigObserver, Loggable {
+  // The compiler only rewrites tag names in a `querySelector` argument when that argument is a
+  // string literal *at the call site*, so selectors held in a field are invisible to it. These
+  // resolve their tags explicitly, and must stay lazy: a static field is evaluated at module load,
+  // which can be before the consumer calls `setTagTransformer`.
   static selectors = {
-    accordionHead: '.bal-list__item__trigger > bal-list-item-accordion-head',
-    accordionBody: '.bal-list__item__trigger > bal-list-item-accordion-body',
-    accordionBodyWrapper:
+    accordionHead: () => `.bal-list__item__trigger > ${transformTag('bal-list-item-accordion-head')}`,
+    accordionBody: () => `.bal-list__item__trigger > ${transformTag('bal-list-item-accordion-body')}`,
+    accordionBodyWrapper: () =>
       '.bal-list__item__trigger > .bal-list__item__accordion-body > .bal-list__item__accordion-body__content',
   }
 
@@ -211,7 +215,7 @@ export class ListItem implements ComponentInterface, BalConfigObserver, Loggable
    */
 
   private addEventListenerAccordionChange = () => {
-    const accordionHeadEl = this.el.querySelector<any>(ListItem.selectors.accordionHead)
+    const accordionHeadEl = this.el.querySelector<any>(ListItem.selectors.accordionHead())
     if (accordionHeadEl) {
       accordionHeadEl.addEventListener('balAccordionChange', this.accordionChanged)
 
@@ -221,7 +225,7 @@ export class ListItem implements ComponentInterface, BalConfigObserver, Loggable
   }
 
   private removeEventListenerAccordionChange = () => {
-    const accordionHeadEl = this.el.querySelector<any>(ListItem.selectors.accordionHead)
+    const accordionHeadEl = this.el.querySelector<any>(ListItem.selectors.accordionHead())
     if (accordionHeadEl) {
       accordionHeadEl.removeEventListener('balAccordionChange', this.accordionChanged)
     }
@@ -243,8 +247,8 @@ export class ListItem implements ComponentInterface, BalConfigObserver, Loggable
   }
 
   private expandAccordion = (initialUpdate = false) => {
-    const contentEl = this.el.querySelector<HTMLElement>(ListItem.selectors.accordionBody)
-    const contentElWrapper = this.el.querySelector<HTMLElement>(ListItem.selectors.accordionBodyWrapper)
+    const contentEl = this.el.querySelector<HTMLElement>(ListItem.selectors.accordionBody())
+    const contentElWrapper = this.el.querySelector<HTMLElement>(ListItem.selectors.accordionBodyWrapper())
 
     if (initialUpdate || contentEl === null || contentElWrapper === null) {
       this.state = AccordionState.Expanded
@@ -291,7 +295,7 @@ export class ListItem implements ComponentInterface, BalConfigObserver, Loggable
   }
 
   private collapseAccordion = (initialUpdate = false, ignoreNested = false) => {
-    const contentEl = this.el.querySelector<HTMLElement>(ListItem.selectors.accordionBody)
+    const contentEl = this.el.querySelector<HTMLElement>(ListItem.selectors.accordionBody())
 
     if (initialUpdate || contentEl === null) {
       this.state = AccordionState.Collapsed
@@ -352,7 +356,7 @@ export class ListItem implements ComponentInterface, BalConfigObserver, Loggable
    */
 
   private onClickTrigger = (ev: MouseEvent) => {
-    const accordionBodyEl = this.el.querySelector<any>(ListItem.selectors.accordionBody)
+    const accordionBodyEl = this.el.querySelector<any>(ListItem.selectors.accordionBody())
     if (accordionBodyEl) {
       if (!accordionBodyEl.contains(ev.target)) {
         this.balNavigate.emit(ev)

@@ -1,4 +1,4 @@
-import { HTMLStencilElement } from '@stencil/core/internal'
+import { HTMLStencilElement, transformTag } from '@stencil/core/internal'
 import { balBrowser } from '../browser'
 import { waitForComponent } from '../helpers'
 
@@ -34,7 +34,7 @@ export abstract class BalNoticeController {
       this.setupContainer(options)
       const clone = this.findClone(options)
       if (clone === undefined) {
-        const el: HTMLNoticeElement = document.createElement(this.options.tag) as unknown as HTMLNoticeElement
+        const el: HTMLNoticeElement = document.createElement(transformTag(this.options.tag)) as unknown as HTMLNoticeElement
         Object.assign(el, options)
         el.addEventListener('balClose', ev => {
           this.removeFromQueue((<any>ev).detail)
@@ -52,7 +52,7 @@ export abstract class BalNoticeController {
   }
 
   async dismissAll(): Promise<void> {
-    const elements = this.container?.querySelectorAll(this.options.tag)
+    const elements = this.container?.querySelectorAll(transformTag(this.options.tag))    
     if (elements) {
       const closingQueue = []
       for (let index = 0; index < elements.length; index++) {
@@ -85,13 +85,15 @@ export abstract class BalNoticeController {
 
   private setupContainer(options: BalNoticeOptions) {
     if (balBrowser.hasDocument) {
-      const containerId = `${this.options.tag}-container`
+      // the id must follow the transformed tag, otherwise two versions of the design system
+      // running side by side would share a single container element
+      const containerId = `${transformTag(this.options.tag)}-container`
       this.container = document.getElementById(containerId) as any as HTMLStencilElement
 
       if (this.container) return
 
       if (!this.container) {
-        this.container = document.createElement('bal-notices') as HTMLStencilElement
+        this.container = document.createElement(transformTag('bal-notices')) as HTMLStencilElement
         this.container.setAttribute('interface', this.options.tag.replace('bal-', ''))
         this.container.setAttribute('animated', options.animated ? 'true' : 'false')
         if (options.container !== undefined) {

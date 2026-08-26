@@ -1,5 +1,6 @@
 import { ICellRendererComp, ICellRendererParams } from 'ag-grid-community'
 import { parseValue } from './utils/parsing'
+import { transformTag } from '@baloise/ds-core'
 
 interface BalTableTagRendererOptions {
   color?: (params: ICellRendererParams) => BalProps.BalTagColor
@@ -13,7 +14,7 @@ export function BalTableTagRenderer(options: BalTableTagRendererOptions): ICellR
   Renderer.prototype.init = function (params: ICellRendererParams): void {
     if (params.value !== null && params.value !== undefined) {
       this.params = params
-      this.element = document.createElement('bal-tag')
+      this.element = document.createElement(transformTag('bal-tag'))
       this.element.setAttribute('size', 'small')
       this.element.className = 'bal-table-cell-tag'
       this.update()

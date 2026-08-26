@@ -1,5 +1,5 @@
 import { EventEmitter } from '@stencil/core'
-import { HTMLStencilElement } from '@stencil/core/internal'
+import { HTMLStencilElement, transformTag } from '@stencil/core/internal'
 import { balBrowser } from './browser'
 import { BalConfig, useBalConfig } from './config'
 import {
@@ -120,7 +120,7 @@ export const debounce = (func: (...args: any[]) => void, wait = 0) => {
 }
 
 export const hasTagName = (element: any, tag: string) => {
-  return element && element.tagName && element.tagName === tag.toUpperCase()
+  return element && element.tagName && element.tagName === transformTag(tag).toUpperCase()
 }
 
 export const isDescendant = (
@@ -140,7 +140,7 @@ export const isDescendant = (
 export const hasParent = (parentTag: string, child: HTMLElement | EventTarget) => {
   let node = (child as any).parentNode
   while (node != null) {
-    if (node.tagName === parentTag.toUpperCase()) {
+    if (node.tagName === transformTag(parentTag).toUpperCase()) {
       return true
     }
     node = node.parentNode
@@ -312,7 +312,7 @@ export const isChildOfEventTarget = async (
     let target = ev.target as HTMLElement | HTMLStencilElement
 
     // special case for the navbar case
-    const isNavbarBrand = ev.target.nodeName === 'BAL-NAVBAR-BRAND'
+    const isNavbarBrand = ev.target.nodeName === transformTag('bal-navbar-brand').toUpperCase()
     if (isNavbarBrand) {
       target = target.closest('bal-navbar') as HTMLStencilElement
     }
@@ -353,9 +353,11 @@ export const waitForDesignSystem = async (el: any | null, _config?: BalConfig): 
   if (element !== null && element !== undefined) {
     await deepReady(element, true)
 
+    // not anchored with `^`, so tags still match once a tag transformer adds a prefix.
+    // trade-off: an unrelated custom element containing "bal" is now matched too.
     const webComponents = Array.prototype.slice
       .call(element.querySelectorAll('*'))
-      .filter(el => el.tagName.match(/^bal/i))
+      .filter(el => el.tagName.match(/bal/i))
 
     await Promise.all(
       webComponents.map(c => {
