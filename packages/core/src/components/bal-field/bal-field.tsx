@@ -1,7 +1,7 @@
 import { Component, ComponentInterface, Element, Event, EventEmitter, h, Host, Prop, Watch } from '@stencil/core'
 import { HTMLStencilElement, transformTag } from '@stencil/core/internal'
 import { BalAriaFormLinking, defaultBalAriaForm } from '../../utils/form'
-import { deepReady, waitAfterFramePaint } from '../../utils/helpers'
+import { deepReady, transformTagSelector, waitAfterFramePaint } from '../../utils/helpers'
 import { BalMutationObserver, ListenToMutation } from '../../utils/mutation'
 
 @Component({
@@ -12,6 +12,9 @@ export class Field implements ComponentInterface, BalMutationObserver {
   @Element() el!: HTMLStencilElement
 
   private fieldId = `bal-field-${FieldIds++}`
+  // These tags are kept untransformed on purpose: the transformation happens where the selectors are
+  // queried, because a class field is evaluated at module load, which can be before the consumer
+  // calls `setTagTransformer`.
   private formControlElement = ['bal-field-control']
   private inputElements = [
     'bal-input',
@@ -141,7 +144,7 @@ export class Field implements ComponentInterface, BalMutationObserver {
   }
 
   private findDirectChild = (selectors: string): BalAriaFormLinking | undefined => {
-    const element = this.el.querySelector<any>(selectors)
+    const element = this.el.querySelector<any>(transformTagSelector(selectors))
     const isDirectChild = this.isDirectChild(element)
     if (isDirectChild) {
       if (this.isVisible(element)) {
@@ -154,7 +157,9 @@ export class Field implements ComponentInterface, BalMutationObserver {
   private findDirectChildren = (selectors: string[]): BalAriaFormLinking[] => {
     return selectors
       .map(selector => {
-        return Array.from(this.el.querySelectorAll<any>(selector)).filter(this.isDirectChild).filter(this.isVisible)
+        return Array.from(this.el.querySelectorAll<any>(transformTagSelector(selector)))
+          .filter(this.isDirectChild)
+          .filter(this.isVisible)
       })
       .flat()
   }
@@ -235,7 +240,7 @@ export class Field implements ComponentInterface, BalMutationObserver {
   }
 
   private notifyComponents<T>(selectors: string[], callback: (component: T) => void) {
-    const components = this.el.querySelectorAll<Element>(selectors.join(', '))
+    const components = this.el.querySelectorAll<Element>(selectors.map(transformTagSelector).join(', '))
     components.forEach(c => callback(c as any))
   }
 

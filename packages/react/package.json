@@ -16,13 +16,16 @@
     "@stencil/react-output-target": "1.5.3"
   },
   "exports": {
+    "./package.json": "./package.json",
     ".": {
       "types": "./index.esm.d.ts",
-      "import": "./index.esm.js"
+      "import": "./index.esm.js",
+      "default": "./index.esm.js"
     },
     "./tag-transformer": {
       "types": "./tag-transformer.esm.d.ts",
-      "import": "./tag-transformer.esm.js"
+      "import": "./tag-transformer.esm.js",
+      "default": "./tag-transformer.esm.js"
     }
   }
 }

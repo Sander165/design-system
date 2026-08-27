@@ -2,7 +2,7 @@ import { balBrowser } from '../../utils/browser'
 import { componentOnReady, getAppRoot } from '../../utils/helpers'
 import { getOverlay, getOverlays } from '../../utils/overlays/overlays'
 import { ModalOptions } from './bal-modal.type'
-import { transformTag } from '@baloise/ds-core'
+import { transformTag } from '@stencil/core/internal'
 
 export * from './bal-modal.type'
 

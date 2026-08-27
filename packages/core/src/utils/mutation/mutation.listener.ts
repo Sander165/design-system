@@ -1,4 +1,4 @@
-import { HTMLStencilElement } from '@stencil/core/internal'
+import { HTMLStencilElement, transformTag } from '@stencil/core/internal'
 import { deepReady, waitAfterFramePaint } from '../helpers'
 import { ListenerAbstract } from '../types/listener'
 import { MutationObserverOptions } from './mutation.interfaces'
@@ -17,7 +17,9 @@ export class BalMutationListener extends ListenerAbstract {
   constructor(options: Partial<MutationObserverOptions>) {
     super()
     this.waitAfterFramePrint = options.waitAfterFramePrint || this.waitAfterFramePrint
-    this.tags = (options.tags || []).map(t => t.toLowerCase())
+    // the listener is created in `connectedCallback`, so the consumer had the chance to call
+    // `setTagTransformer` and the transformed tags match the `nodeName` of the observed records
+    this.tags = (options.tags || []).map(t => transformTag(t).toLowerCase())
     this.mutationObserverInit = {
       childList: options.childList === false ? false : true,
       subtree: options.subtree === false ? false : true,

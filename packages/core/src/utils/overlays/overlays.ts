@@ -36,14 +36,13 @@ export const prepareOverlay = (overlay: OverlayInterface) => {
   }
 }
 
-export const getOverlays = (doc: Document, selector?: string): HTMLBalOverlayElement[] => {
+export const getOverlays = (doc: Document, overlayTag?: string): HTMLBalOverlayElement[] => {
   // the selector is built at runtime, so the compiler cannot transform the tags for us here.
-  // callers pass a plain tag name (e.g. 'bal-modal'), which we transform ourselves.
-  if (selector === undefined) {
-    selector = `${transformTag('bal-modal')},${transformTag('bal-snackbar')},${transformTag('bal-toast')}`
-  } else {
-    selector = transformTag(selector)
-  }
+  // `overlayTag` is a plain tag name (e.g. 'bal-modal'), not a selector, which we transform ourselves.
+  const selector =
+    overlayTag === undefined
+      ? `${transformTag('bal-modal')},${transformTag('bal-snackbar')},${transformTag('bal-toast')}`
+      : transformTag(overlayTag)
   return (Array.from(doc.querySelectorAll(selector)) as HTMLBalOverlayElement[]).filter(c => c.overlayIndex > 0)
 }
 

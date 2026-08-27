@@ -1,5 +1,6 @@
 import { Component, Element, h, Host, Method, Prop, Watch } from '@stencil/core'
 import { BEM } from '../../utils/bem'
+import { transformTagSelector } from '../../utils/helpers'
 
 @Component({
   tag: 'bal-navbar',
@@ -56,7 +57,8 @@ export class Navbar {
   }
 
   private notifyComponents<T>(selectors: string[], callback: (component: T) => void) {
-    const components = this.element.querySelectorAll<Element>(selectors.join(', '))
+    // the selector is joined at runtime, so the compiler cannot rewrite the tags for us here
+    const components = this.element.querySelectorAll<Element>(selectors.map(transformTagSelector).join(', '))
     components.forEach(c => callback(c as any))
   }
   render() {

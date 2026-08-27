@@ -123,6 +123,20 @@ export const hasTagName = (element: any, tag: string) => {
   return element && element.tagName && element.tagName === transformTag(tag).toUpperCase()
 }
 
+/**
+ * Applies the tag transformer to every tag of a tag based selector like `bal-field-control bal-input`.
+ *
+ * The compiler only rewrites tag names of a `querySelector` argument when that argument is a string
+ * literal at the call site, so selectors that are built at runtime - e.g. joined from a list of tags -
+ * have to be transformed here.
+ */
+export const transformTagSelector = (selector: string): string =>
+  selector
+    .split(' ')
+    .filter(tag => tag.length > 0)
+    .map(tag => transformTag(tag))
+    .join(' ')
+
 export const isDescendant = (
   parent: HTMLElement | HTMLStencilElement,
   child: HTMLElement | HTMLStencilElement | EventTarget,
@@ -353,19 +367,14 @@ export const waitForDesignSystem = async (el: any | null, _config?: BalConfig): 
   if (element !== null && element !== undefined) {
     await deepReady(element, true)
 
-    // not anchored with `^`, so tags still match once a tag transformer adds a prefix.
-    // trade-off: an unrelated custom element containing "bal" is now matched too.
+    // matching the tag name is not reliable anymore as soon as a tag transformer is set: it would
+    // miss every transformer that does not keep the `bal` prefix and match unrelated custom elements
+    // that happen to contain it. The design system components are detected by their config API instead.
     const webComponents = Array.prototype.slice
       .call(element.querySelectorAll('*'))
-      .filter(el => el.tagName.match(/bal/i))
+      .filter(el => typeof el.configChanged === 'function')
 
-    await Promise.all(
-      webComponents.map(c => {
-        if (c.configChanged !== null && c.configChanged !== undefined) {
-          return c.configChanged(config)
-        }
-      }),
-    )
+    await Promise.all(webComponents.map(c => c.configChanged(config)))
   }
 
   await Promise.all([waitAfterFramePaint(), waitAfterLargestContentfulPaintCallback(), waitAfterIdleCallback()])

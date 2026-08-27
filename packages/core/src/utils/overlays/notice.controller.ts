@@ -34,7 +34,7 @@ export abstract class BalNoticeController {
       this.setupContainer(options)
       const clone = this.findClone(options)
       if (clone === undefined) {
-        const el: HTMLNoticeElement = document.createElement(transformTag(this.options.tag)) as unknown as HTMLNoticeElement
+        const el = document.createElement(transformTag(this.options.tag)) as unknown as HTMLNoticeElement
         Object.assign(el, options)
         el.addEventListener('balClose', ev => {
           this.removeFromQueue((<any>ev).detail)
@@ -52,7 +52,7 @@ export abstract class BalNoticeController {
   }
 
   async dismissAll(): Promise<void> {
-    const elements = this.container?.querySelectorAll(transformTag(this.options.tag))    
+    const elements = this.container?.querySelectorAll(transformTag(this.options.tag))
     if (elements) {
       const closingQueue = []
       for (let index = 0; index < elements.length; index++) {
